@@ -1,0 +1,12 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: yordle-backend-config
+data:
+  endpoints.yaml: |
+    name: backend
+    port: {{ .Values.port }}
+    host: {{ .Values.service }}
+    protocol: https
+
+  
