@@ -1,0 +1,24 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build the backend
+      run: make build_backend
+    - name: Build the frontend
+      run: make build_frontend
+    - name: push the backend
+      run: make push_backend
+    - name: push the frontend
+      run: make push_frontend
