@@ -1,0 +1,19 @@
+version: '3.3'
+
+services:
+  frontend:
+    image: raspberrypi:5000/yordle-frontend:latest
+    ports:
+      - "3000:3000"
+      
+  proxy:
+    image: nginx:latest
+    volumes:
+    - ../config/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+
+  backend:
+    image: raspberrypi:5000/yordle-backend:latest
+    ports:
+      - "8000:8000"

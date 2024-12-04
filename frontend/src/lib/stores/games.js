@@ -1,38 +1,28 @@
 import { readable, writable } from 'svelte/store';
+import  { api } from './url.js'
 
 
 /**
  * This store will fetch the games from the API every second.
- * 
  */
 const games = readable([], (set, update) => {
   const interval = setInterval(() => {
-    fetch("/api/games", {headers: {
+    let apiURL = api()
+    fetch(`/api/games`, {headers: {
       "accept": "application/json"
-    }}).then(response => response.json()).then(data => {
+    }}).then(response => {
+      if (!response.ok) {
+        throw new Error("Failed to fetch games")
+      }
+      return response.json()
+    }).then(data => {
       set(data)
-    }).catch(error => {
-      console.error('Error:', error);
-    });
+    })
   }, 1000);
 
 	return () => clearInterval(interval);
 });
 
-const activeGames = writable([], (set, update) => {
-  const interval = setInterval(() => {
-    fetch("/api/active", {headers: {
-      "accept": "application/json"
-    }}).then(response => response.json()).then(data => {
-      set(data)
-    }).catch(error => {
-      console.error('Error:', error);
-    });
-  }, 1000);
-
-  return () => clearInterval(interval);
-})
 
 
-
-export { games, activeGames }
+export { games }

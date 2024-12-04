@@ -2,6 +2,7 @@
 
 @use '@material/theme/color-palette';
 
+
 // Svelte Colors!
 @use '@material/theme/index' as theme with (
   $primary: #ff3e00,
@@ -23,3 +24,4 @@ a {
 a:visited {
   color: color.scale(#40b3ff, $lightness: -35%);
 }
+

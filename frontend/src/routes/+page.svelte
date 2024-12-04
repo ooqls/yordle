@@ -16,7 +16,7 @@
       <Card>
         <Content>{ game.key }</Content>
         <Actions>
-          <Button href="/yordle/{game.key}">
+          <Button href="/{game.name}/{game.key}">
             <Label>Join</Label>
           </Button>
         </Actions>
@@ -27,7 +27,7 @@
       <Card>
         <Content>{ game }</Content>
         <Actions>
-          <Button on:click={() => { startNewGame(game)}}>
+          <Button on:click={() => { startNewGame(game) } }>
             <Label>Play</Label>
           </Button>
         </Actions>
@@ -69,9 +69,9 @@
 </body>
 
 <script>
-  import { onMount } from "svelte";
-  import Title from "../components/title.svelte";
-  import { games, activeGames } from 'stores/games';
+  import { onDestroy, onMount } from "svelte";
+  import Title from "$components/title.svelte";
+  import { games } from 'stores/games';
   import { goto } from "$app/navigation";
 
   import Card, {
@@ -83,9 +83,10 @@
   } from '@smui/card';
   import Button, { Label } from '@smui/button';
   import CircularProgress from '@smui/circular-progress';
+  import { api } from 'stores/url';
 
-    import { redirect } from "@sveltejs/kit";
-  let answer = 'hello';
+  export let data;
+
 
   /**
    * @type {string[]}
@@ -110,20 +111,43 @@
    */
   let liveGames = [];
 
+  /**
+   * @type {Function}
+   */
+  let unsubscribe;
+
+  let apiURL = api();
+
+  /**
+   * @typedef {Object} GameList
+   * @property {string[]} game_list
+   * @property {LiveGame[]} active_games
+   */
+
+  /**
+   * @param {GameList} value
+   */
+  function updateGames(value) {
+    availableGames = value.game_list || [];
+    liveGames = value.active_games || [];
+  }
 
   onMount(() => {
-    games.subscribe(value => {
-      availableGames = value
-    });
-
-    activeGames.subscribe(value => {
-      liveGames = value
-    });
+    unsubscribe = games.subscribe(updateGames);
     console.log('mounted');
+
 
     setTimeout(() => {
       loading = false;
     }, 1000);
+
+  });
+
+  onDestroy(() => {
+    console.log('unmounted');
+    if (unsubscribe) {
+      unsubscribe();
+    }
   });
 
 
@@ -132,20 +156,23 @@
    * @param {String} game
    */
   async function startNewGame(game) {
-    let resp = await fetch(`/api/games?game=${game}`, {
+    let resp = await fetch(`/api/${game}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "clientid": data.clientId,
       },
       body: game,
     });
 
     if (resp.ok && resp.body != undefined) {
       const newGame = await resp.json();
-      console.log(`going to ${newGame.game}`)
+      console.log(`going to ${newGame.game_key}`)
       // go to page with key
-      goto(`/yordle/${newGame.game_key}`)
+      
+      goto(`/${game}/${newGame.game_key}`);
     }
+    
   }
 
   /**

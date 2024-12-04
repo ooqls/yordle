@@ -17,6 +17,9 @@
 		"@smui/button": "^7.0.0",
 		"@smui/card": "^7.0.0",
 		"@smui/circular-progress": "^7.0.0",
+		"@smui/common": "^7.0.0",
+		"@smui/fab": "^7.0.0",
+		"@smui/list": "^7.0.0",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/adapter-node": "^5.2.5",
 		"@sveltejs/kit": "^2.0.0",
@@ -30,6 +33,7 @@
 	"type": "module",
 	"dependencies": {
 		"@smui/linear-progress": "^7.0.0",
+		"cockatiel": "^3.2.1",
 		"dotenv": "^16.4.5",
 		"socket.io": "^4.7.5",
 		"socket.io-client": "^4.7.5",

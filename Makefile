@@ -2,12 +2,13 @@
 SHELL := /bin/bash
 
 IMAGE_REPOSITORY ?= "samrreynolds4/"
+DOCKERFILES ?= "./devops/yordle/dockerfiles"
 
 build_frontend:
-	docker build -t ${IMAGE_REPOSITORY}yordle-frontend:latest -f ./devops/dockerfiles/frontend.dockerfile .
+	docker build -t ${IMAGE_REPOSITORY}yordle-frontend:latest -f ${DOCKERFILES}/frontend.dockerfile .
 
 build_backend:
-	docker build -t ${IMAGE_REPOSITORY}yordle-backend:latest -f ./devops/dockerfiles/backend.dockerfile .
+	docker build -t ${IMAGE_REPOSITORY}yordle-backend:latest -f ${DOCKERFILES}/backend.dockerfile .
 
 push_backend:
 	docker push ${IMAGE_REPOSITORY}yordle-backend:latest

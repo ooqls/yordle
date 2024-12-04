@@ -1,13 +1,14 @@
 from internal.games.player_input import PlayerInput
-from internal.models import GameKey
+from internal.models import GameKey, PlayerID
 from enum import Enum
 
 
-
 class State(Enum):
-  ACTIVE = 1
-  LOST = 2
-  WON = 3
+  INITIALIZING = 0
+  STARTING = 1
+  ACTIVE = 2
+  OVER = 3
+  WAITING = 4
 
 
 class GameState:
@@ -15,8 +16,17 @@ class GameState:
     pass
   def get_game_name(self) -> str:
     pass
-  def play_game(self, player_input: PlayerInput):
+  def play_game(self, id: str, player_input: PlayerInput):
     pass
-  def get_state(self) -> dict:
+  def get_state(self, player_id: PlayerID) -> dict:
     pass
-
+  def add_player(id: PlayerID):
+    pass
+  def update(self):
+    pass
+  def is_over(self):
+    pass
+  def get_start_time(self):
+    pass
+  def get_players() -> set[PlayerID]:
+    pass

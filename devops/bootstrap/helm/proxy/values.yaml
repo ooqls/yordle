@@ -1,0 +1,27 @@
+public:
+  locations:
+  - path: /
+    service: games-proxy.proxy.svc.cluster.local
+    port: 80
+    extra: ""
+
+
+image: nginx:latest
+secretName: ""
+replicaCount: 1
+tunnelUUID: b7db8cf7-2a96-43cf-abee-037e41b8f34e
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+ingress:
+- hostname: games.bagelmochi.com
+  service: http://games-proxy:80
+- hostname: home.bagelmochi.com
+  service: http://private-proxy:80
+- service: http_status:404  # Default catch-all rule

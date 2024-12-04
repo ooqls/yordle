@@ -1,25 +1,25 @@
 
 import { sveltekit } from '@sveltejs/kit/vite'
 import { defineConfig } from 'vite'
-import config from './config.js'
+// import { api, websocket } from './config.js'
 
 
 export default defineConfig({
 	plugins: [sveltekit()],
+	envDir: './env/',
 	server: {
+		port: 8080,
 		proxy: {
 			'/api': {
-				target: config.urls.api,
+				target: 'http://localhost:8000',
 				changeOrigin: true,
-				rewrite: (path) => path.replace(/^\/api/, ''),
 				headers: {
 					accept: 'application/json',
 				}
 			},
 			'/websocket': {
-				target: config.urls.websocket,
+				target: 'ws://localhost:8000',
 				changeOrigin: true,
-				rewrite: (path) => path.replace(/^\/websocket/, ''),
 			}
 		}
 	}

@@ -1,0 +1,13 @@
+repo: "samrreynolds4"
+image: "yordle-backend"
+tag: latest
+  
+port: 8000
+service: backend
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 128Mi
