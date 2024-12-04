@@ -66,10 +66,30 @@
       grid-area: 1 / 1 / 3 / 2;
     }
 
-    @media (max-width: 60px) {
+    .desktop-view {
+      display: block;
+    }
+
+    .mobile-view {
+      display: none;
+    }
+
+    @media (max-width: 600px) {
+      .desktop-view {
+        display: none;
+      }
+
+      .mobile-view {
+        display: block;
+      }
+
+      .score-container {
+        padding-bottom: 10px;
+      }
+
       .wordle-container {
-      grid-template-columns: repeat(5, 1fr);
-      grid-template-rows: repeat(5, 1fr);
+        display: flex;
+        flex-direction: column;
       }
 
       .keyboard {
@@ -158,7 +178,12 @@
     {#if state === GameState.ACTIVE}
     <div class="wordle-container">
       <div class="score-container">
-        <Scoreboard currentPlayerId={clientId} scores={currentScores}></Scoreboard>
+        <div class="desktop-view">
+            <Scoreboard currentPlayerId={clientId} scores={currentScores}></Scoreboard>
+        </div>
+        <div class="mobile-view">
+          <Rank scores={currentScores} currentPlayerId={clientId} />
+        </div>
       </div>
       <div class="wordle-text-container">
         <div class="guess-container">
@@ -219,6 +244,7 @@ import Title from "$components/title.svelte"
 import WordleText from "$components/wordleText.svelte";
 import WordleHint from "$components/wordleHint.svelte";
 import Countdown from "$components/countdown.svelte";
+import Rank from "$components/rank.svelte";
 import Button from "@smui/button";
 import { Entry } from "$components/types"
 import Fab from "@smui/fab";
