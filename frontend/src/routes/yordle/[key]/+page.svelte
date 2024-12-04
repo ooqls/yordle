@@ -6,6 +6,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-direction: column;
     }
 
     .keyboard {
@@ -107,9 +108,6 @@
       margin: 3px;
       }
 
-      .button-container {
-      flex-direction: column;
-      }
 
       .game-container {
       grid-template-rows: 1fr 1fr 4fr;
@@ -171,6 +169,8 @@
       <Button aria-disabled={state != GameState.ACTIVE} on:click={() => { leaveGame() }}>Leave</Button>
       {#if state == GameState.ACTIVE}
       <Timer secondsLeft={secondsLeft} />
+      <br />
+      <b>Lvl: {currentIndex+1}</b>
       {:else if state == GameState.WAITING}
       <Button on:click={startGame}>Start</Button>
       {/if}
@@ -268,6 +268,7 @@ let clientId;
 
 let currentGuess = ""
 let allCurrentGuesses = {}
+let currentIndex = 0
 
 let currentScores = {}
 let answerLen = 10
@@ -284,7 +285,7 @@ let wsURL = websocket()
 let guessHistory = []
 
 let rows = [
-  ["Q", "W", "E", "R", "T", "Y"],
+  ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
   ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
   ["Z", "X", "C", "V", "B", "N", "M"],
   ["BACKSPACE", "ENTER"]
@@ -356,6 +357,10 @@ function updateState(new_state) {
   if (new_state.state != undefined) {
     state = new_state.state
   } 
+
+  if (new_state.word_index != undefined && clientId in new_state.word_index) {
+    currentIndex = new_state.word_index[clientId]
+  }
 
   if (new_state.current_guess != undefined) {
     allCurrentGuesses = new_state.current_guess
