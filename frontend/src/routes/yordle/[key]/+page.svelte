@@ -9,48 +9,6 @@
       flex-direction: column;
     }
 
-    .keyboard {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-    }
-    .keyboard-row {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-    }
-
-    .key {
-      flex: 1;
-      /* max-width: 100px; */
-      /* max-height: 100px; */
-      margin: 5px;
-      text-align: center;
-      line-height: 40px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      cursor: pointer;
-      user-select: none;
-      transition: background 0.3s;
-      background-color: var(--background-color);
-      color: var(--text-color);
-    }
-
-    .key:hover {
-      background: #f0f0f0;
-    }
-    .key:active {
-      background: #ccc;
-    }
-    @media (max-width: 600px) {
-      .key {
-        /* max-width: 30px; */
-        height: 30px;
-        line-height: 30px;
-        margin: 3px;
-      }
-    }
     .header {
       text-align: center;
       margin-top: 20px;
@@ -93,28 +51,17 @@
         flex-direction: column;
       }
 
-      .keyboard {
-      flex-direction: column;
-      align-items: center;
-      }
-
-      .keyboard-row {
-      justify-content: center;
-      }
-
-      .key {
-      height: 30px;
-      line-height: 30px;
-      margin: 3px;
+      .keyboard-container {
+        width: 100%;
       }
 
 
       .game-container {
-      grid-template-rows: 1fr 1fr 4fr;
+        grid-template-rows: 1fr 1fr 4fr;
       }
 
       .lobby {
-      grid-template-rows: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
       }
     }
     .wordle-text-container {
@@ -140,10 +87,10 @@
       align-items: center;
       justify-content: center;
     }
-    .keyboard {
-      grid-area: 3 / 1 / 6 / 6;
-      font-family: 'Roboto', sans-serif;
-
+    .keyboard-container {
+      grid-area: 1 / 1 / 6 / 6;
+      display: flex;
+      justify-content: center;
     }
 
     .game-container {
@@ -197,21 +144,8 @@
         </div>
         <WordleHint entries={guessHistory} />
       </div>
-
-      <div class="keyboard">
-        {#each rows as row}
-        <div class="keyboard-row">
-          {#each row as ch}
-            {#if ch === "BACKSPACE"}
-            <button disabled={state != GameState.ACTIVE} class="key" on:click={() => removeLetter()}>{ch}</button>
-            {:else if ch === "ENTER"}
-            <button disabled={state != GameState.ACTIVE} class="key" on:click={() => submitAnswer()}>{ch}</button>
-            {:else}
-            <button disabled={state != GameState.ACTIVE} class="key" on:click={() => addLetter(ch)}>{ch}</button>
-            {/if}
-          {/each}
-        </div>
-        {/each}
+      <div class="keyboard-container">
+        <Keyboard enter={submitAnswer} backspace={removeLetter} onKeyPress={addLetter} disabled={state !== GameState.ACTIVE} />
       </div>
     </div>
     {:else if state === GameState.OVER}
@@ -244,6 +178,7 @@ import Title from "$components/title.svelte"
 import WordleText from "$components/wordleText.svelte";
 import WordleHint from "$components/wordleHint.svelte";
 import Countdown from "$components/countdown.svelte";
+import Keyboard from "$components/keyboard.svelte";
 import Rank from "$components/rank.svelte";
 import Button from "@smui/button";
 import { Entry } from "$components/types"
