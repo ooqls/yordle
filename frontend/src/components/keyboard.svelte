@@ -74,6 +74,10 @@
   export let backspace = () => {}
   export let enter = () => {}
 
+  /**
+   * 
+   * @param {String} ch
+   */
   export let onKeyPress = (ch) => {}
   export let disabled = false
 

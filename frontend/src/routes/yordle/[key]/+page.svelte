@@ -25,22 +25,8 @@
       grid-area: 1 / 1 / 3 / 2;
     }
 
-    .desktop-view {
-      display: block;
-    }
-
-    .mobile-view {
-      display: none;
-    }
 
     @media (max-width: 600px) {
-      .desktop-view {
-        display: none;
-      }
-
-      .mobile-view {
-        display: block;
-      }
 
       .score-container {
         padding-bottom: 10px;
@@ -116,7 +102,6 @@
       <Button aria-disabled={state != GameState.ACTIVE} on:click={() => { leaveGame() }}>Leave</Button>
       {#if state == GameState.ACTIVE}
       <Timer secondsLeft={secondsLeft} />
-      <br />
       <b>Lvl: {currentIndex+1}</b>
       {:else if state == GameState.WAITING}
       <Button on:click={startGame}>Start</Button>
@@ -125,12 +110,7 @@
     {#if state === GameState.ACTIVE}
     <div class="wordle-container">
       <div class="score-container">
-        <div class="desktop-view">
-            <Scoreboard currentPlayerId={clientId} scores={currentScores}></Scoreboard>
-        </div>
-        <div class="mobile-view">
-          <Rank scores={currentScores} currentPlayerId={clientId} />
-        </div>
+        <Scoreboard currentPlayerId={clientId} scores={currentScores}></Scoreboard>
       </div>
       <div class="wordle-text-container">
         <div class="guess-container">
@@ -151,14 +131,14 @@
     {:else if state === GameState.OVER}
     <div class="summary">
       <h1>Game Over</h1>
-      <Scoreboard currentPlayerId={clientId} scores={currentScores}></Scoreboard>
+      <Scoreboard disableMobileView={true} currentPlayerId={clientId} scores={currentScores}></Scoreboard>
     </div>
     {:else if state === GameState.WAITING}
     <div class="lobby">
       <div class="button-container">
         <Button href="/"></Button>  
       </div>
-      <Scoreboard currentPlayerId={clientId} scores={currentScores} />
+      <Scoreboard disableMobileView={true} currentPlayerId={clientId} scores={currentScores} />
     </div>
     {:else if state === GameState.STARTING}
     <Countdown delay={5} />
