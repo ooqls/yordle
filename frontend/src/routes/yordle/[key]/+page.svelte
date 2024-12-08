@@ -121,7 +121,7 @@
     justify-content: center;
   }
   .keyboard-container {
-    grid-area: 1 / 3 / 6 / 6;
+    grid-area: 2 / 1 / 6 / 6;
     display: flex;
     justify-content: center;
   }
