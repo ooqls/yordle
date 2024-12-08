@@ -1,6 +1,15 @@
-<div>
-  <b>Rank: {rank}/{Object.keys(scores).length} Score: {scores[currentPlayerId]}</b>
+<div class="rank-container">
+  <b>Rank: {rank}/{Object.keys(scores).length}</b> 
+  <b>Score: {scores[currentPlayerId]}</b>
 </div>
+
+<style>
+  .rank-container {
+    display: flex;
+    flex-direction: column;
+    font-size: large;
+  }
+</style>
 
 <script>
   import { run } from 'svelte/legacy';

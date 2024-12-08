@@ -39,6 +39,7 @@
 
     .mobile-view {
       display: block;
+      
     }
   }
 </style>
