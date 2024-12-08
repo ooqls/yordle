@@ -1,113 +1,20 @@
-<svelte:window  on:keydown={handleKeyPress} />
-
-<head>
-  <style>
-    .button-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-    }
-
-    .header {
-      text-align: center;
-      margin-top: 20px;
-    }
-    .wordle-container {
-      display: grid;
-      align-items: center;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      grid-template-rows: repeat(5, minmax(0, 1fr));
-    }
-
-
-    .score-container {
-      grid-area: 1 / 1 / 3 / 2;
-    }
-
-
-    @media (max-width: 600px) {
-
-      .score-container {
-        padding-bottom: 10px;
-      }
-
-      .wordle-container {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .keyboard-container {
-        width: 100%;
-      }
-
-
-      .game-container {
-        grid-template-rows: 1fr 1fr 4fr;
-      }
-
-      .lobby {
-        grid-template-rows: 1fr 1fr;
-      }
-    }
-    .wordle-text-container {
-      grid-area: 1 / 2 / 3 / 6;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .guess-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-
-    }
-
-    .summary {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-    .keyboard-container {
-      grid-area: 1 / 1 / 6 / 6;
-      display: flex;
-      justify-content: center;
-    }
-
-    .game-container {
-      display: grid;
-      grid-template-rows: 1fr 1fr 4fr;
-      align-items: center;
-    }
-
-    .lobby {
-      display: grid;
-      grid-template-rows: 1fr 1fr;
-      align-items: center;
-    }
-  </style>
-</head>
-<body>
+<svelte:window on:keypress={handleKeyPress} />
+<div>
   <div class="game-container">
     <Title title="yordle"></Title>
     <div class="button-container">
       <!-- <Fab extended href="/"><Label>Back</Label></Fab>
       <Fab extended on:click={() => { submitAnswer() } }><Label>Submit</Label></Fab> -->
 
-      <Button aria-disabled={state != GameState.ACTIVE} on:click={() => { leaveGame() }}>Leave</Button>
-      {#if state == GameState.ACTIVE}
+      <Button onclick={() => { leaveGame() }}>Leave</Button>
+      {#if curState == GameState.ACTIVE}
       <Timer secondsLeft={secondsLeft} />
       <b>Lvl: {currentIndex+1}</b>
-      {:else if state == GameState.WAITING}
-      <Button on:click={startGame}>Start</Button>
+      {:else if curState == GameState.WAITING}
+      <Button onclick={() => {startGame()}}>Start</Button>
       {/if}
     </div>
-    {#if state === GameState.ACTIVE}
+    {#if curState === GameState.ACTIVE}
     <div class="wordle-container">
       <div class="score-container">
         <Scoreboard currentPlayerId={clientId} scores={currentScores}></Scoreboard>
@@ -125,31 +32,114 @@
         <WordleHint entries={guessHistory} />
       </div>
       <div class="keyboard-container">
-        <Keyboard enter={submitAnswer} backspace={removeLetter} onKeyPress={addLetter} disabled={state !== GameState.ACTIVE} />
+        <Keyboard enter={submitAnswer} backspace={removeLetter} onKeyPress={addLetter} disabled={curState !== GameState.ACTIVE} />
       </div>
     </div>
-    {:else if state === GameState.OVER}
+    {:else if curState === GameState.OVER}
     <div class="summary">
       <h1>Game Over</h1>
       <Scoreboard disableMobileView={true} currentPlayerId={clientId} scores={currentScores}></Scoreboard>
     </div>
-    {:else if state === GameState.WAITING}
+    {:else if curState === GameState.WAITING}
     <div class="lobby">
-      <div class="button-container">
-        <Button href="/"></Button>  
-      </div>
       <Scoreboard disableMobileView={true} currentPlayerId={clientId} scores={currentScores} />
     </div>
-    {:else if state === GameState.STARTING}
+    {:else if curState === GameState.STARTING}
     <Countdown delay={5} />
-    {:else if state === GameState.INITIALIZING}
+    {:else if curState === GameState.INITIALIZING}
     <CircularProgress style="height: 32px; width: 32px;" indeterminate />
     {/if}
-</body>
+  </div>
+</div>
+
+<style>
+  .button-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .wordle-container {
+    display: grid;
+    align-items: center;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-rows: repeat(5, minmax(0, 1fr));
+  }
+
+
+  .score-container {
+    grid-area: 1 / 1 / 3 / 2;
+  }
+
+
+  @media (max-width: 600px) {
+
+    .score-container {
+      padding-bottom: 10px;
+    }
+
+    .wordle-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .keyboard-container {
+      width: 100%;
+    }
+
+
+    .game-container {
+      grid-template-rows: 1fr 1fr 4fr;
+    }
+
+    .lobby {
+      grid-template-rows: 1fr 1fr;
+    }
+  }
+  .wordle-text-container {
+    grid-area: 1 / 2 / 3 / 6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .guess-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+  }
+
+  .summary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .keyboard-container {
+    grid-area: 1 / 1 / 3 / 6;
+    display: flex;
+    justify-content: center;
+  }
+
+  .game-container {
+    display: grid;
+    grid-template-rows: 1fr 1fr 4fr;
+    align-items: center;
+  }
+
+  .lobby {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    align-items: center;
+  }
+</style>
 
 <script>
-import websocketStore from "svelte-websocket-store";
-import LinearProgress from '@smui/linear-progress';
 import CircularProgress from '@smui/circular-progress';
 
 
@@ -159,53 +149,46 @@ import WordleText from "$components/wordleText.svelte";
 import WordleHint from "$components/wordleHint.svelte";
 import Countdown from "$components/countdown.svelte";
 import Keyboard from "$components/keyboard.svelte";
-import Rank from "$components/rank.svelte";
 import Button from "@smui/button";
 import { Entry } from "$components/types"
-import Fab from "@smui/fab";
-import { Label } from "@smui/common"
-import Score from '$components/score.svelte'
 import Scoreboard from "$components/scoreboard.svelte";
 import Timer from "$components/timer.svelte";
-import Card from "@smui/card";
 import { goto } from "$app/navigation";
-import { api, websocket } from "stores/url"
 
 
 
-export let data;
-let gameKey = ""
+let { data } = $props()
 
 /**
  * @type {string|undefined}
  */
-let clientId;
+let clientId = $state("")
 
-let currentGuess = ""
-let allCurrentGuesses = {}
-let currentIndex = 0
+let currentGuess = $state("")
+/**
+ * @type {Object<string, string>}
+ */
+let allCurrentGuesses = $state({})
 
-let currentScores = {}
-let answerLen = 10
-let allAnswerLen = {}
-let correctPercent = 0.0
-let score = 0
-let apiURL = api()
-let wsURL = websocket()
+let currentIndex = $state(0)
+
+/**
+ * @type {Object<string, number>}
+ */
+let currentScores = $state({})
+let answerLen = $state(10)
+/**
+ * @type {Object<string, number>}
+ */
+let allAnswerLen = $state({})
+
+let score = $state(0)
 
 
 /**
  * @type {Entry[]}
 */
-let guessHistory = []
-
-let rows = [
-  ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
-  ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
-  ["Z", "X", "C", "V", "B", "N", "M"],
-  ["BACKSPACE", "ENTER"]
-]
-
+let guessHistory = $state([])
 
 const GameState = {
   ACTIVE: "State.ACTIVE",
@@ -217,8 +200,8 @@ const GameState = {
 /**
  * @type {String}
  */
-let state = GameState.WAITING
-let secondsLeft = 30
+let curState = $state(GameState.WAITING)
+let secondsLeft = $state(30)
 
 /**
  * @type {WebSocket} socket
@@ -235,24 +218,21 @@ let updateGuess = (guess) => {
   currentGuess = guess
 }
 
+/**
+ * updates the current state
+ * @param {Object<string, any>} new_state
+ */
 function updateState(new_state) {
-  console.log("new state", new_state)
-  console.log("client id", clientId)
-
+  if (clientId === undefined) {
+    return
+  }
   
   if (new_state.answer_len !== undefined) {
     allAnswerLen = new_state.answer_len
     if (allAnswerLen[clientId] !== undefined) {
       answerLen = allAnswerLen[clientId]
-      console.log("new answer len", answerLen)
     }
   }
-
-  if (new_state.correct_percent != undefined) {
-    correctPercent = new_state.correct_percent
-    console.log(correctPercent)
-  }
-
 
   if (new_state.scores != undefined) {
     if (clientId != undefined && new_state.scores[clientId] != undefined) {
@@ -270,7 +250,7 @@ function updateState(new_state) {
   }
 
   if (new_state.state != undefined) {
-    state = new_state.state
+    curState = new_state.state
   } 
 
   if (new_state.word_index != undefined && clientId in new_state.word_index) {
@@ -279,7 +259,6 @@ function updateState(new_state) {
 
   if (new_state.current_guess != undefined) {
     allCurrentGuesses = new_state.current_guess
-    console.log(allCurrentGuesses)
     if (clientId != undefined && allCurrentGuesses[clientId] != undefined) {
       updateGuess(allCurrentGuesses[clientId])
     }
@@ -288,7 +267,6 @@ function updateState(new_state) {
 
 function connect() {
   try {
-    console.dir(wsURL)
     socket = new WebSocket(`/websocket/yordle/${data.gameKey}/ws?client_id=${clientId}`);
     socket.onmessage = (message) => {
       let ev = JSON.parse(message.data)
@@ -299,18 +277,13 @@ function connect() {
     }
 
     socket.onclose = (event) => {
-      console.log("closing", event)
       if (closing) {
         return
       }
       
-      console.log("socket closed", event)
       if (event.reason === "game_over") {
-        console.log("game over")
         const interval = setInterval(() => {
-          console.log("fetching new state")
-          if (state === GameState.OVER) {
-            console.log("clearing interval")
+          if (curState === GameState.OVER) {
             clearInterval(interval)
             return
           }
@@ -323,7 +296,6 @@ function connect() {
           }).then(resp => resp.json()).then((respData) => {
             updateState(respData.state)
           }).catch((err) => {
-            console.log(err)
             clearInterval(interval)
           })
         }, 1000)
@@ -345,12 +317,9 @@ onMount(() => {
   clientId = data.clientId
   currentGuess = ""
   answerLen = 10
-  console.log("game key", data.gameKey)
-  gameKey = data.gameKey
 
   connect()
  
-  console.log('mounted');
   return () => {
     closing = true
     if (socket) {
@@ -370,9 +339,8 @@ onDestroy(() => {
  * @param {any} event
  */
 function handleKeyPress(event) {
-  if (state === GameState.ACTIVE) {
+  if (curState === GameState.ACTIVE) {
     const letter = event.key.toUpperCase();
-    console.log(letter)
     if (letter === "BACKSPACE") {
       removeLetter()
     } else if (letter === "ENTER") {
@@ -407,13 +375,13 @@ function submitAnswer() {
 }
 
 function startGame() {
-  if (socket && state === GameState.WAITING) {
+  if (socket && curState === GameState.WAITING) {
     socket.send(newActionMessage("START", null))
   }
 }
 
 function isActive() {
-  return state === GameState.ACTIVE
+  return curState === GameState.ACTIVE
 }
 
 /**
@@ -421,7 +389,6 @@ function isActive() {
  * @param {string} letter
  */
 function addLetter(letter) {
-  console.log("adding", letter)
   if (socket && isActive()) {
     // $socket = {"game_key": data.game_key, "player_input": {"action": "ADD", "data": letter}}
     socket.send(newActionMessage("ADD", letter))
@@ -429,7 +396,6 @@ function addLetter(letter) {
 }
 
 function removeLetter() {
-  console.log("removing")
   if (socket && isActive()) {
     // $socket = {"game_key": data.game_key, "player_input": {"action": "BACKSPACE"}}
     socket.send(newActionMessage("BACKSPACE", null))

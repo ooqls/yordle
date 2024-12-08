@@ -45,21 +45,29 @@
 
 
 <script>
+  import { run } from 'svelte/legacy';
+
   import List, { Item, Separator, Text } from '@smui/list'; 
   import Score from "./score.svelte";
   import Rank from './rank.svelte';
+  
   /**
-   * @type {Object.<string, number>}
+   * @typedef {Object} Props
+   * @property {Object.<string, number>} [scores]
+   * @property {string} [currentPlayerId]
+   * @property {boolean} [disableMobileView]
    */
-  export let scores = {}
-  export let currentPlayerId = ""
-  export let disableMobileView = false
-  let rank = 0
-  $: scores, rank = calculateRank()
+
+  /** @type {Props} */
+  let { scores = {}, currentPlayerId = "", disableMobileView = false } = $props();
+  let rank = $state(0)
 
   function calculateRank() {
     let sortedScores = Object.entries(scores).sort((a, b) => b[1] - a[1])
     let rank = sortedScores.findIndex(([key, value]) => key === currentPlayerId) + 1
     return rank
   }
+  run(() => {
+    scores, rank = calculateRank()
+  });
 </script>

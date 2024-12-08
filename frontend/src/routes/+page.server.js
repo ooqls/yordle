@@ -6,7 +6,6 @@ export function load({ cookies  }) {
     clientId = Math.random().toString(36).substring(7);
     cookies.set("client-id", clientId, { path: "/", secure: false });
   }
-  console.log("client-id", clientId)
 
   return {
     clientId: clientId,

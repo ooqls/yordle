@@ -9,6 +9,7 @@ const config = {
 			"$components": "./src/components",
 			"$models": "./src/lib/models",
 		},
+		
 	}
 	
 };

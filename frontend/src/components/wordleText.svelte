@@ -30,18 +30,21 @@
 <script>
     import { onMount } from "svelte";
 
-  export let text = ""
-  export let maxLetters = 10
 
   onMount(() => {
     if (maxLetters === undefined) {
       maxLetters = text.length
     }
-    console.log(maxLetters, text)
   })
 
+  
   /**
-   * @type {Array<string>}
+   * @typedef {Object} Props
+   * @property {string} [text]
+   * @property {number} [maxLetters]
+   * @property {Array<string>} [colorMap]
    */
-  export let colorMap = []
+
+  /** @type {Props} */
+  let { text = "", maxLetters = $bindable(10), colorMap = [] } = $props();
 </script>

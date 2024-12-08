@@ -13,10 +13,18 @@
 </style>
 
 <script>
-  export let score = 0
-  export let player = ""
-  let previousScore = 0
-  let addScore = 0
+  import { run } from 'svelte/legacy';
+
+  /**
+   * @typedef {Object} Props
+   * @property {number} [score]
+   * @property {string} [player]
+   */
+
+  /** @type {Props} */
+  let { score = 0, player = "" } = $props();
+  let previousScore = $state(0)
+  let addScore = $state(0)
   /**
    * @type {any}
    */
@@ -26,7 +34,6 @@
    * @param {Number} newScore
    */
   function updateScore(newScore) {
-    console.log("got a new score", newScore)
     let newAddScore = newScore - previousScore
     if (timer !== undefined) {
       clearTimeout(timer)
@@ -47,5 +54,7 @@
 
   }
 
-  $: score, updateScore(score)
+
+  $effect(() => updateScore(score))
+
 </script>

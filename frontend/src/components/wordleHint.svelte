@@ -37,8 +37,12 @@
   import WordleText from "./wordleText.svelte";
   import { Entry } from './types'
 
+  
   /**
-   * @type {Array<Entry>} entries
+   * @typedef {Object} Props
+   * @property {Array<Entry>} [entries]
    */
-  export let entries = []
+
+  /** @type {Props} */
+  let { entries = [] } = $props();
 </script>

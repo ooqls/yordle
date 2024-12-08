@@ -1,4 +1,4 @@
-<svelte:window  on:resize={() => { updateTitle(window) } } />
+<svelte:window  onresize={() => { updateTitle(window) }} />
 <div class="title">
 <h1>{ expandedTitle }</h1>
 </div>
@@ -15,8 +15,14 @@
   let vowels = ['A', 'E', 'I', 'O', 'U'];
 
   let vowelIndex = -1;
-  export let title = "";
-  let expandedTitle = "";
+  /**
+   * @typedef {Object} Props
+   * @property {string} [title]
+   */
+
+  /** @type {Props} */
+  let { title = $bindable("") } = $props();
+  let expandedTitle = $state("");
   let expandLetter = '';
   let consanantsLen = 0;
 

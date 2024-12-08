@@ -3,11 +3,11 @@
   <div class="keyboard-row">
     {#each row as ch}
       {#if ch === "BACKSPACE"}
-      <button disabled={disabled} class="key" on:click={() => backspace()}>{ch}</button>
+      <button disabled={disabled} class="key" onclick={() => backspace()}>{ch}</button>
       {:else if ch === "ENTER"}
-      <button disabled={disabled} class="key" on:click={() => enter()}>{ch}</button>
+      <button disabled={disabled} class="key" onclick={() => enter()}>{ch}</button>
       {:else}
-      <button disabled={disabled} class="key" on:click={() => onKeyPress(ch)}>{ch}</button>
+      <button disabled={disabled} class="key" onclick={() => onKeyPress(ch)}>{ch}</button>
       {/if}
     {/each}
   </div>
@@ -71,15 +71,23 @@
 </style>
 
 <script>
-  export let backspace = () => {}
-  export let enter = () => {}
 
+  
   /**
-   * 
-   * @param {String} ch
+   * @typedef {Object} Props
+   * @property {any} [backspace]
+   * @property {any} [enter]
+   * @property {any} [onKeyPress]
+   * @property {boolean} [disabled]
    */
-  export let onKeyPress = (ch) => {}
-  export let disabled = false
+
+  /** @type {Props} */
+  let {
+    backspace = () => {},
+    enter = () => {},
+    onKeyPress = () => {},
+    disabled = false
+  } = $props();
 
   let rows = [
   ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],

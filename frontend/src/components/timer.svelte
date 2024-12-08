@@ -10,12 +10,21 @@
 </style>
 
 <script>
+  import { run } from 'svelte/legacy';
+
   import { onMount } from "svelte";
 
-  export let secondsLeft = 0
-  let displaySeconds = ""
-  $: displaySeconds = Math.ceil(secondsLeft).toString().padStart(4, "0");
-  $: console.log("new: ", displaySeconds);
+  /**
+   * @typedef {Object} Props
+   * @property {number} [secondsLeft]
+   */
+
+  /** @type {Props} */
+  let { secondsLeft = 0 } = $props();
+  let displaySeconds = $state("")
+  run(() => {
+    displaySeconds = Math.ceil(secondsLeft).toString().padStart(4, "0");
+  });
   // let interval = setInterval(() => {
   //   if (secondsLeft <= 0) {
   //     secondsLeft = 0

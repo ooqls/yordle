@@ -1,13 +1,10 @@
-
-
-<!-- <svelte:window  on:resize={() => { updateTitle(window) } } /> -->
-<body>
+<div>
   <div class="game-menu">
     <!-- <h1>{ title }</h1> -->
     <Title title="GAMES"></Title>
-    {#if availableGames.length === 0 || loading }
+    {#if availableGames.length === 0 || loading}
     <div>  
-      <CircularProgress style="height: 32px; width: 32px;" indeterminate />
+      <CircularProgress style="height: 32px; width: 32px" indeterminate/>
     </div>
     {:else}
     
@@ -16,7 +13,7 @@
       <Card>
         <Content>{ game.key }</Content>
         <Actions>
-          <Button href="/{game.name}/{game.key}">
+          <Button onclick={() => goto(`${game.name}/${game.key}`)}>
             <Label>Join</Label>
           </Button>
         </Actions>
@@ -27,46 +24,37 @@
       <Card>
         <Content>{ game }</Content>
         <Actions>
-          <Button on:click={() => { startNewGame(game) } }>
+          <Button onclick={() => { startNewGame(game) } }>
             <Label>Play</Label>
           </Button>
         </Actions>
       </Card>
       {/each}
 
-      {#each loadingGames as game}
-      <Card>
-        <Content>Startng { game }...</Content>
-      </Card>
-      {/each}
     </div>
     {/if}
   </div>
+</div>
 
-  <style>
-    .game-menu {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 20px;
-    }
-    .game-list {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 20px;
-    }
+<style>
+  .game-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+  }
+  .game-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+  }
 
-    .game-list .mdc-card {
-      flex: auto;
-    }
-
-    
-  </style>
-</body>
+  
+</style>
 
 <script>
   import { onDestroy, onMount } from "svelte";
@@ -76,29 +64,22 @@
 
   import Card, {
     Content,
-    PrimaryAction,
     Actions,
-    ActionButtons,
-    ActionIcons,
   } from '@smui/card';
   import Button, { Label } from '@smui/button';
   import CircularProgress from '@smui/circular-progress';
-  import { api } from 'stores/url';
 
-  export let data;
+  let { data } = $props();
 
 
   /**
    * @type {string[]}
    */
-  let availableGames = [];
+  let availableGames = $state([]);
 
-  /**
-   * @type {string[]}
-  */
-  let loadingGames = [];
 
-  let loading = true;
+
+  let loading = $state(true);
 
   /**
    * @typedef {Object} LiveGame
@@ -109,14 +90,13 @@
   /**
    * @type {LiveGame[]} liveGames
    */
-  let liveGames = [];
+  let liveGames = $state([]);
 
   /**
    * @type {Function}
    */
   let unsubscribe;
 
-  let apiURL = api();
 
   /**
    * @typedef {Object} GameList
@@ -134,7 +114,6 @@
 
   onMount(() => {
     unsubscribe = games.subscribe(updateGames);
-    console.log('mounted');
 
 
     setTimeout(() => {
@@ -144,7 +123,6 @@
   });
 
   onDestroy(() => {
-    console.log('unmounted');
     if (unsubscribe) {
       unsubscribe();
     }
@@ -167,23 +145,10 @@
 
     if (resp.ok && resp.body != undefined) {
       const newGame = await resp.json();
-      console.log(`going to ${newGame.game_key}`)
       // go to page with key
       
       goto(`/${game}/${newGame.game_key}`);
     }
     
-  }
-
-  /**
-   * 
-   * @param {string} letter
-   */
-  function addLetter(letter) {
-      answer += letter;
-  }
-
-  function removeLetter() {
-      answer = answer.slice(0, -1);
   }
 </script>

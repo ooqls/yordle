@@ -13,7 +13,13 @@
 
   import List, { Item, Separator, Text } from '@smui/list'; 
 
-  export let players = {}
-  export let currentPlayerId = ""
+  /**
+   * @typedef {Object} Props
+   * @property {any} [players]
+   * @property {string} [currentPlayerId]
+   */
+
+  /** @type {Props} */
+  let { players = {}, currentPlayerId = "" } = $props();
 
 </script>

@@ -20,11 +20,17 @@
 
 <script>
   import { onMount } from "svelte"
-  export let delay = 0
-  export let postMessage = ""
+  /**
+   * @typedef {Object} Props
+   * @property {number} [delay]
+   * @property {string} [postMessage]
+   */
+
+  /** @type {Props} */
+  let { delay = 0, postMessage = "" } = $props();
   
-  let displayMessage = false
-  let secondsLeft = delay
+  let displayMessage = $state(false)
+  let secondsLeft = $state(delay)
   onMount(() => {
     
     let countdown = setInterval(() => {
