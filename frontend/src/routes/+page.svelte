@@ -9,28 +9,38 @@
     {:else}
     
     <div class="game-list">
-      {#each liveGames as game}
-      <Card>
-        <Content>{ game.key }</Content>
-        <Actions>
-          <Button onclick={() => goto(`${game.name}/${game.key}`)}>
-            <Label>Join</Label>
-          </Button>
-        </Actions>
-      </Card>
-      {/each}
-
       {#each availableGames as game}
       <Card>
-        <Content>{ game }</Content>
-        <Actions>
+        <PrimaryAction onclick={() => { startNewGame(game)}}> 
+
+          <Content class="game-card"><b>{ game }</b></Content>
+        <!-- <Actions>
           <Button onclick={() => { startNewGame(game) } }>
             <Label>Play</Label>
           </Button>
-        </Actions>
+        </Actions> -->
+        </PrimaryAction>
       </Card>
       {/each}
 
+      {#each liveGames as game}
+      <Card>
+        <PrimaryAction onclick={() => goto(`${game.name}/${game.key}`)}> 
+          <Content class="game-card">
+            <p>
+              <b>{ game.key }</b>
+              <br />
+              { game.name }
+            </p>
+          </Content>
+        <!-- <Actions>
+          <Button onclick={() => goto(`${game.name}/${game.key}`)}>
+            <Label>Join</Label>
+          </Button>
+        </Actions> -->
+        </PrimaryAction>
+      </Card>
+      {/each}
     </div>
     {/if}
   </div>
@@ -44,6 +54,7 @@
     align-items: center;
     gap: 20px;
   }
+
   .game-list {
     display: flex;
     flex-direction: row;
@@ -52,6 +63,17 @@
     align-items: center;
     gap: 20px;
   }
+
+  * :global(.game-card) {
+    min-width: 100px;
+    min-height: 100px;
+    justify-content: center;
+    text-align: center;
+    font-size: larger;
+    display: flex;
+    align-items: center;
+  }
+
 
   
 </style>
@@ -64,8 +86,12 @@
 
   import Card, {
     Content,
+    PrimaryAction,
+    Media,
     Actions,
+    MediaContent,
   } from '@smui/card';
+  import Ripple from "@smui/ripple";
   import Button, { Label } from '@smui/button';
   import CircularProgress from '@smui/circular-progress';
 
