@@ -3,32 +3,16 @@
   <div class="game-container">
     <Title title="yordle"></Title>
     <div class="button-container">
-      <!-- <Fab extended href="/"><Label>Back</Label></Fab>
-      <Fab extended on:click={() => { submitAnswer() } }><Label>Submit</Label></Fab> -->
-
       <Button onclick={() => { leaveGame() }}>Leave</Button>
-      
       {#if curState == GameState.ACTIVE}
-      <Timer secondsLeft={secondsLeft} />
-      <b>Lvl: {currentIndex+1}</b>
-      {:else if curState == GameState.WAITING}
-      <Button onclick={() => {startGame()}}>Start</Button>
+      <h2>Guesses Left: {displayGuesses}</h2>
       {/if}
     </div>
     {#if curState === GameState.ACTIVE}
     <div class="wordle-container">
-      <div class="score-container">
-        <Scoreboard currentPlayerId={clientId} scores={currentScores}></Scoreboard>
-      </div>
       <div class="wordle-text-container">
-        <div class="guess-container">
-          {#each Object.keys(allCurrentGuesses) as playerId}
-            {#if playerId !== clientId && allAnswerLen[playerId] !== undefined}
-              <WordleText maxLetters={allAnswerLen[playerId]} text={allCurrentGuesses[playerId]} />
-            {/if}
-          {/each}          
+        <div class="guess-container">         
           <WordleText maxLetters={answerLen} text={currentGuess} />
-
         </div>
         <WordleHint entries={guessHistory} />
       </div>
@@ -38,15 +22,12 @@
     </div>
     {:else if curState === GameState.OVER}
     <div class="summary">
-      <h1>Game Over</h1>
-      <Scoreboard disableMobileView={true} currentPlayerId={clientId} scores={currentScores}></Scoreboard>
+      {#if isWon}
+      <h1>Correct!</h1>
+      {:else}
+      <h1>Incorrect</h1>
+      {/if}
     </div>
-    {:else if curState === GameState.WAITING}
-    <div class="lobby">
-      <Scoreboard disableMobileView={true} currentPlayerId={clientId} scores={currentScores} />
-    </div>
-    {:else if curState === GameState.STARTING}
-    <Countdown delay={5} />
     {:else if curState === GameState.INITIALIZING}
     <CircularProgress style="height: 32px; width: 32px;" indeterminate />
     {/if}
@@ -69,16 +50,7 @@
   }
 
 
-  .score-container {
-    grid-area: 1 / 1 / 3 / 2;
-  }
-
-
   @media (max-width: 600px) {
-
-    .score-container {
-      padding-bottom: 10px;
-    }
 
     .wordle-container {
       display: flex;
@@ -89,14 +61,10 @@
       width: 100%;
     }
 
-
     .game-container {
       grid-template-rows: 1fr 1fr 4fr;
     }
 
-    .lobby {
-      grid-template-rows: 1fr 1fr;
-    }
   }
   .wordle-text-container {
     grid-area: 1 / 2 / 3 / 6;
@@ -132,12 +100,6 @@
     grid-template-rows: 1fr 1fr 4fr;
     align-items: center;
   }
-
-  .lobby {
-    display: grid;
-    grid-template-rows: 1fr 1fr;
-    align-items: center;
-  }
 </style>
 
 <script>
@@ -148,16 +110,16 @@ import { onMount,onDestroy, setContext, getContext } from "svelte";
 import Title from "$components/title.svelte"
 import WordleText from "$components/wordleText.svelte";
 import WordleHint from "$components/wordleHint.svelte";
-import Countdown from "$components/countdown.svelte";
 import Keyboard from "$components/keyboard.svelte";
 import Button from "@smui/button";
 import { Entry } from "$components/types"
-import Scoreboard from "$components/scoreboard.svelte";
-import Timer from "$components/timer.svelte";
 import { goto } from "$app/navigation";
 
 
 
+/**
+ * @type {Object<string, any>}
+ */
 let { data } = $props()
 
 /**
@@ -165,31 +127,35 @@ let { data } = $props()
  */
 let clientId = $state("")
 
+/**
+ * @type {string}
+ */
 let currentGuess = $state("")
-/**
- * @type {Object<string, string>}
- */
-let allCurrentGuesses = $state({})
-
-let currentIndex = $state(0)
 
 /**
- * @type {Object<string, number>}
+ * @type {number} length of the answer
  */
-let currentScores = $state({})
 let answerLen = $state(10)
-/**
- * @type {Object<string, number>}
- */
-let allAnswerLen = $state({})
-
-let score = $state(0)
-
 
 /**
  * @type {Entry[]}
 */
 let guessHistory = $state([])
+
+/**
+ * @type {boolean} determines whether or not the last submition was correct
+ */
+let isWon = $state(false)
+
+/**
+ * @type {number} number of guesses left
+ */
+let guessesLeft = $state(0)
+
+/**
+ * @type {string} display of guesses left
+ */
+let displayGuesses = $state("")
 
 const GameState = {
   ACTIVE: "State.ACTIVE",
@@ -202,7 +168,6 @@ const GameState = {
  * @type {String}
  */
 let curState = $state(GameState.WAITING)
-let secondsLeft = $state(30)
 
 /**
  * @type {WebSocket} socket
@@ -211,13 +176,6 @@ let socket;
 let closing = false
 
 
-/**
- * updates the current guess
- * @param {string} guess
- */
-let updateGuess = (guess) => {
-  currentGuess = guess
-}
 
 /**
  * updates the current state
@@ -229,46 +187,30 @@ function updateState(new_state) {
   }
   
   if (new_state.answer_len !== undefined) {
-    allAnswerLen = new_state.answer_len
-    if (allAnswerLen[clientId] !== undefined) {
-      answerLen = allAnswerLen[clientId]
-    }
-  }
-
-  if (new_state.scores != undefined) {
-    if (clientId != undefined && new_state.scores[clientId] != undefined) {
-      score = new_state.scores[clientId]
-    }
-    currentScores = new_state.scores
+    answerLen = new_state.answer_len
   }
 
   if (new_state.guess_history != undefined) {
     guessHistory = new_state.guess_history.guesses
   }
 
-  if (new_state.time_left != undefined) {
-    secondsLeft = new_state.time_left
+  if (new_state.guesses_left != undefined) {
+    guessesLeft = new_state.guesses_left
+    displayGuesses = "🪨".repeat(guessesLeft)
   }
 
   if (new_state.state != undefined) {
     curState = new_state.state
-  } 
-
-  if (new_state.word_index != undefined && clientId in new_state.word_index) {
-    currentIndex = new_state.word_index[clientId]
   }
 
   if (new_state.current_guess != undefined) {
-    allCurrentGuesses = new_state.current_guess
-    if (clientId != undefined && allCurrentGuesses[clientId] != undefined) {
-      updateGuess(allCurrentGuesses[clientId])
-    }
+    currentGuess = new_state.current_guess
   }
 }
 
 function connect() {
   try {
-    socket = new WebSocket(`/websocket/yordle/${data.gameKey}/ws?client_id=${clientId}`);
+    socket = new WebSocket(`/websocket/classicyordle/${data.gameKey}/ws?client_id=${clientId}`);
     socket.onmessage = (message) => {
       let ev = JSON.parse(message.data)
 
@@ -289,11 +231,9 @@ function connect() {
             return
           }
 
-          fetch(`/api/wordle/${data.gameKey}`, {
+          fetch(`/api/classicyordle/${data.gameKey}`, {
             method: "GET",
-            headers: clientId ? {
-              "clientid": clientId
-            } : {}
+            headers: clientId ? { "clientid": clientId } : {}
           }).then(resp => resp.json()).then((respData) => {
             updateState(respData.state)
           }).catch((err) => {

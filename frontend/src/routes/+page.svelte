@@ -11,9 +11,9 @@
     <div class="game-list">
       {#each availableGames as game}
       <Card>
-        <PrimaryAction onclick={() => { startNewGame(game)}}> 
+        <PrimaryAction onclick={() => { startNewGame(game.name)}}> 
 
-          <Content class="game-card"><b>{ game }</b></Content>
+          <Content class="game-card"><b>{ game.display_name }</b></Content>
         <!-- <Actions>
           <Button onclick={() => { startNewGame(game) } }>
             <Label>Play</Label>
@@ -30,7 +30,7 @@
             <p>
               <b>{ game.key }</b>
               <br />
-              { game.name }
+              { game.display_name }
             </p>
           </Content>
         <!-- <Actions>
@@ -82,6 +82,7 @@
   import { onDestroy, onMount } from "svelte";
   import Title from "$components/title.svelte";
   import { games } from 'stores/games';
+  import { Game, GameList } from '$models/models.js'
   import { goto } from "$app/navigation";
 
   import Card, {
@@ -91,15 +92,14 @@
     Actions,
     MediaContent,
   } from '@smui/card';
-  import Ripple from "@smui/ripple";
-  import Button, { Label } from '@smui/button';
   import CircularProgress from '@smui/circular-progress';
 
   let { data } = $props();
 
 
+
   /**
-   * @type {string[]}
+   * @type {Game[]}
    */
   let availableGames = $state([]);
 
@@ -108,13 +108,7 @@
   let loading = $state(true);
 
   /**
-   * @typedef {Object} LiveGame
-   * @property {string} name
-   * @property {string} key
-   */
-
-  /**
-   * @type {LiveGame[]} liveGames
+   * @type {Game[]} liveGames
    */
   let liveGames = $state([]);
 
@@ -123,12 +117,6 @@
    */
   let unsubscribe;
 
-
-  /**
-   * @typedef {Object} GameList
-   * @property {string[]} game_list
-   * @property {LiveGame[]} active_games
-   */
 
   /**
    * @param {GameList} value

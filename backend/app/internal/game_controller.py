@@ -4,6 +4,7 @@ from internal.games.game_state import GameState
 from internal.models import GameKey, PlayerID, NewGameResponse, Game
 from internal.websocket import Socket
 import internal.games.wordle as wordle
+import internal.games.classic_wordle as classic_wordle
 from datetime import datetime
 import asyncio
 import logging
@@ -21,26 +22,28 @@ class NoSuchGameException(Exception):
 
 class GameController:
   game_map: dict[str, NewGameCallable] = {
-    wordle.GAME_NAME: wordle.new_yordle_game
+    wordle.GAME_KEY: wordle.new_yordle_game,
+    classic_wordle.GAME_KEY: classic_wordle.new_classic_wordle_game,
   }
+  game_list: dict[str, str] = {wordle.DISPLAY_NAME: wordle.GAME_KEY, classic_wordle.DISPLAY_NAME: classic_wordle.GAME_KEY}
   
   
   def __init__(self):
-    self.active_games = dict()
+    self.active_games: dict[str, GameState] = dict()
     self.finished_games = dict()
     self.connections = dict()
     self.player_game_mapping = dict()
     
 
   def get_game_list(self) -> list[str]:
-    return [game for game in self.game_map.keys()]
+    return [Game(display_name=display_name, name=name) for display_name, name in self.game_list.items()]
   
   def get_active_games(self) -> list[Game]:
     game_list = list()
     
     for key, game in self.active_games.items():
       if not game.is_over():
-        game_list.append(Game(name=game.get_game_name(), key=key))
+        game_list.append(Game(name=game.get_game_name(), display_name=game.get_display_name(), key=key))
     
     return game_list
   

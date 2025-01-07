@@ -5,6 +5,7 @@ import internal.records.words as words
 import unittest
 
 test_game_key = "mock"
+test_game_name = "yordle"
 
 def new_game_controller():
   ctrl = GameController()
@@ -21,7 +22,7 @@ class TestGameController(unittest.IsolatedAsyncioTestCase):
   
   def test_new_game(self):
     ctrl = new_game_controller()
-    resp = ctrl.new_game("admin", "wordle", test_game_key)
+    resp = ctrl.new_game("admin", test_game_name, test_game_key)
     self.assertIsNotNone(resp)
     self.assertIsNotNone(resp.game_key)
     self.assertEqual(resp.game_key, test_game_key)
@@ -38,7 +39,7 @@ class TestGameController(unittest.IsolatedAsyncioTestCase):
     self.assertIsNotNone(resp)
     self.assertEqual(len(resp), 0)
     
-    ctrl.new_game("admin", "wordle", test_game_key)
+    ctrl.new_game("admin", test_game_name, test_game_key)
     resp = ctrl.get_active_games()
     self.assertIsNotNone(resp)
     self.assertEqual(len(resp), 1)
@@ -47,7 +48,7 @@ class TestGameController(unittest.IsolatedAsyncioTestCase):
     ctrl = new_game_controller()
     ws = new_mock_websocket()
     
-    ctrl.new_game("admin", "wordle", test_game_key)
+    ctrl.new_game("admin", test_game_name, test_game_key)
     ctrl.add_player(test_game_key, "player1", ws)
     players = ctrl.get_players_in_game(test_game_key)
     self.assertIsNotNone(players)
@@ -57,7 +58,7 @@ class TestGameController(unittest.IsolatedAsyncioTestCase):
     ctrl = new_game_controller()
     ws = new_mock_websocket()
     
-    ctrl.new_game("admin", "wordle", test_game_key)
+    ctrl.new_game("admin", test_game_name, test_game_key)
     ctrl.add_player(test_game_key, "player1", ws)
     await ctrl.disconnect_player("player1", test_game_key)
     
@@ -66,11 +67,12 @@ class TestGameController(unittest.IsolatedAsyncioTestCase):
     self.assertIsNotNone(players)
     self.assertEqual(len(players), 0)
     self.assertTrue(ws.closed)
+    
   async def test_broadcast_game_state(self):
     ctrl = new_game_controller()
     ws = new_mock_websocket()
     
-    ctrl.new_game("admin", test_game_key, test_game_key)
+    ctrl.new_game("admin", test_game_name, test_game_key)
     ctrl.add_player(test_game_key, "player1", ws)
     await ctrl.broadcast_game_state(test_game_key)
     
@@ -80,7 +82,7 @@ class TestGameController(unittest.IsolatedAsyncioTestCase):
     game.over = True
     
     await ctrl.broadcast_game_state(test_game_key)
-    self.assertTrue(ws.closed)
+    self.assertFalse(ws.closed)
     
     
 

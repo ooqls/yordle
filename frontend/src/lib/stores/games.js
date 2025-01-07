@@ -1,13 +1,16 @@
 import { readable, writable } from 'svelte/store';
-import  { api } from './url.js'
-
+import {GameList} from '$models/models.js'
 
 /**
- * This store will fetch the games from the API every second.
+ * @type {GameList}
  */
-const games = readable([], (set, update) => {
+
+/**
+ *This store will fetch the games from the API every second.
+ * @type {import('svelte/store').Readable<GameList> } games
+ */
+const games = readable(new GameList([], []), (set, update) => {
   const interval = setInterval(() => {
-    let apiURL = api()
     fetch(`/api/games`, {headers: {
       "accept": "application/json"
     }}).then(response => {

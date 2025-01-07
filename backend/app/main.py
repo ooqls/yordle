@@ -100,18 +100,18 @@ def new_game(game: str, clientid: Annotated[str | None, Header()]) -> str:
     name="websocket_endpoint",
 )
 async def websocket_endpoint(websocket: FastWebSocket, game: str, game_key: str, client_id: str):
-    print("got a websocket")
-    print("clientid", client_id)
+    logger.debug("got a websocket", {"game": game, "game_key": game_key, "client_id": client_id})    
     if game_key == "":
         game_key = generate_game_key()
         
     game = controller.get_game(game_key=game_key)
     if game is not None and game.is_over():
-        print("game is over")
+        logger.debug("game is over")
         await websocket.close(reason="game_over")
     else:
         print("accepting websocket")
         await websocket.accept()
+        websocket.send_json
         await server.connect(WebSocket(websocket), game_key=game_key, game_type=game, client_id=client_id)
 
 @api.post(

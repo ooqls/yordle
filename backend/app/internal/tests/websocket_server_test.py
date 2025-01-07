@@ -4,7 +4,9 @@ import asyncio
 from internal.game_controller import GameController
 from internal.tests.mock_websocket import MockSocket
 import internal.records.words as words
+import logging
 
+test_game_type = "yordle"
 
 def new_websocket_server():
   words.set_word_db("/tmp/test.db")
@@ -16,8 +18,8 @@ class TestGameController(unittest.IsolatedAsyncioTestCase):
     ws1 = MockSocket()
     ws2 = MockSocket()
     
-    done1 = asyncio.Task(server.connect(websocket=ws1, game_key="mock", game_type="wordle", client_id="player1"))
-    done2 = asyncio.Task(server.connect(websocket=ws2, game_key="mock", game_type="wordle", client_id="player2"))
+    done1 = asyncio.Task(server.connect(websocket=ws1, game_key="mock", game_type=test_game_type, client_id="player1"))
+    done2 = asyncio.Task(server.connect(websocket=ws2, game_key="mock", game_type=test_game_type, client_id="player2"))
     await asyncio.sleep(1)
     
     game = server.controller.get_game("mock")
@@ -49,4 +51,5 @@ class TestGameController(unittest.IsolatedAsyncioTestCase):
     self.assertIsNone(game)
     
 if __name__ == "__main__":
+  logging.basicConfig(level=logging.INFO)
   unittest.main()

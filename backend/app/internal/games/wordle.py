@@ -8,8 +8,8 @@ from internal.games.game_state import State, GameState
 from internal.models import GameKey
 from internal.games.percent import edit_distance_percent
 from internal.games.scores import Score
+from internal.games.models import Action, Guess, GuessHistory
 from internal.models import PlayerID
-from enum import Enum
 import asyncio
 import logging
 
@@ -24,16 +24,10 @@ _possible_symbols: str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+{}|:<>?[];',./"
 _possible_colors: list[str] = [
   "Red", "Green", "Yellow", "Cyan", "Magenta", "Orange", "Purple", "Brown", "Pink"
 ]
-GAME_NAME: str = "yordle"
+GAME_KEY: str = "yordle"
+DISPLAY_NAME: str = "Competitve Yordle"
 STARTING_DELAY = 5
 GAME_TIME = 100
-
-class Action(Enum):
-  ADD = "ADD"
-  BACKSPACE = "BACKSPACE"
-  SUBMIT = "SUBMIT"
-  START = "START"
-
 
 def _build_letter_count(word: str) -> dict[str, int]:
   letter_count = dict()
@@ -59,7 +53,7 @@ class WordleGameState(GameState):
   def __init__(self, admin: str, key: str, word_db: WordDB):
     self.word_db = word_db
     self.game_key = key
-    self.guess_history: dict[str, list] = {}
+    self.guess_history: dict[str, list[Guess]] = {}
     self.start_time = datetime.now()
     self.admin = admin
     self.game_time = GAME_TIME
@@ -133,7 +127,7 @@ class WordleGameState(GameState):
     self.current_guess[self.word_index[player_id]][player_id] = ""
   
   def add_to_guess_history(self, player_id: PlayerID, guess: str, colors: list[str]):
-    self.guess_history[player_id].insert(0, {"guess": guess, "colors": colors})
+    self.guess_history[player_id].insert(0, Guess(guess=guess, colors=colors))
 
   def reset_guess_history(self, player_id: PlayerID):
     self.guess_history[player_id] = []
@@ -271,7 +265,7 @@ class WordleGameState(GameState):
     state = {
       "state": str(self.state),
       "current_guess": self.current_guess[self.word_index[player_id]],
-      "guess_history": self.get_guess_history(player_id),
+      "guess_history": GuessHistory(guesses=self.get_guess_history(player_id)).model_dump(),
       "scores": {id: score.get_score() for id, score in self.scores.items()},
       "word_index": self.word_index
     }
@@ -285,11 +279,14 @@ class WordleGameState(GameState):
     
     return state
 
-  def get_game_name(self) -> str:
-    return GAME_NAME
+  def get_display_name(self) -> str:
+    return DISPLAY_NAME
   
   def get_game_key(self) -> GameKey:
     return self.game_key
+  
+  def get_game_name(self):
+    return GAME_KEY
   
   def game_over(self):
     self.state = State.OVER

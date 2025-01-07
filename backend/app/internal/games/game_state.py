@@ -12,9 +12,11 @@ class State(Enum):
 
 
 class GameState:
+  def get_game_name(self) -> str:
+    pass
   def get_game_key(self) -> GameKey:
     pass
-  def get_game_name(self) -> str:
+  def get_display_name(self) -> str:
     pass
   def play_game(self, id: str, player_input: PlayerInput):
     pass

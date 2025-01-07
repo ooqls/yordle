@@ -51,7 +51,7 @@ class WeboscketGameServer:
       if e.reason != "game_over":
         logger.error("websocket disconnect reason %s", e.reason)
     except Exception as e:
-      logger.error("error", e)
+      logger.error("error %s", e)
       await self.disconnect_player(websocket, game_key, client_id)
     
   async def _connect(self, websocket: Socket, game_key: str, game_type: str, client_id: str):
