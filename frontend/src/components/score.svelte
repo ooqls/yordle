@@ -13,7 +13,8 @@
 </style>
 
 <script>
-  import { run } from 'svelte/legacy';
+    import { onMount } from "svelte";
+
 
   /**
    * @typedef {Object} Props
@@ -29,28 +30,36 @@
    * @type {any}
    */
   let timer = undefined
+
+
+  onMount(() => {
+    timer = setInterval(() => {
+      if (addScore > 0) {
+        let addup = setInterval(() => {
+          if (addScore > 0) {
+            addScore -= 1
+            previousScore += 1
+          } else {
+            clearInterval(addup)
+          }
+        }, 10)
+      }
+
+    }, 2000)
+
+    return () => { clearInterval(timer) }
+  })
   /**
    * 
    * @param {Number} newScore
    */
   function updateScore(newScore) {
-    let newAddScore = newScore - previousScore
-    if (timer !== undefined) {
-      clearTimeout(timer)
+    console.log("updating score")
+    if (newScore == previousScore) {
+      return
     }
 
-    addScore = newAddScore
-    timer = setTimeout(()=>{
-      let diff = Math.max(Math.ceil(addScore / 100), 1)
-      let addUp = setInterval(() => {
-        previousScore += diff
-        addScore -= diff
-        if (addScore <=  0) {
-          clearInterval(addUp)
-        }
-      }, 1)
-    }, 2000)
-
+    addScore = newScore - previousScore
 
   }
 

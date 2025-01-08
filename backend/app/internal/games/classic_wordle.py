@@ -9,7 +9,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 GAME_KEY: str = "classicyordle"
-DISPLAY_NAME: str = "Yordle"
+DISPLAY_NAME: str = "✨ Yordle"
 
 def new_classic_wordle_game(id: PlayerID, key: str) -> GameState:
   return ClassicWordleGameState(admin_id=id, key=key)

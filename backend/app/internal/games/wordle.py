@@ -1,6 +1,12 @@
 from random import randint
 import random
 import string
+import asyncio
+import logging
+import os
+import sys
+
+
 from datetime import datetime
 from internal.records.words import WordDB, get_word_db
 from internal.games.player_input import PlayerInput
@@ -10,44 +16,16 @@ from internal.games.percent import edit_distance_percent
 from internal.games.scores import Score
 from internal.games.models import Action, Guess, GuessHistory
 from internal.models import PlayerID
-import asyncio
-import logging
+from internal.games.wordle_translator import WordleTranslator
+
 
 logger = logging.getLogger(__name__)
 
-
-import os
-
-import sys
-
-_possible_symbols: str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+{}|:<>?[];',./"
-_possible_colors: list[str] = [
-  "Red", "Green", "Yellow", "Cyan", "Magenta", "Orange", "Purple", "Brown", "Pink"
-]
 GAME_KEY: str = "yordle"
-DISPLAY_NAME: str = "Competitve Yordle"
+DISPLAY_NAME: str = "⚔️ Competitve Yordle"
 STARTING_DELAY = 5
 GAME_TIME = 100
 
-def _build_letter_count(word: str) -> dict[str, int]:
-  letter_count = dict()
-  for c in word:
-    if not c in letter_count:
-      letter_count[c] = 0
-    letter_count[c] += 1
-  return letter_count
-
-class Wordle:
-  guess_history = []
-  current_guess = ""
-  letter_count = dict()
-  word_index: int = 0
-  
-  def __init__(self):
-    self.guess_history = []
-    self.current_guess: dict[dict[str, str], int] = {}
-    self.letter_count = dict()
-    self.word_index = 0
 
 class WordleGameState(GameState):
   def __init__(self, admin: str, key: str, word_db: WordDB):
@@ -62,9 +40,7 @@ class WordleGameState(GameState):
     self.words = []
     self.state = State.INITIALIZING
     self.scores: dict[str, Score] = {}
-    self.right_place_right_letter = ""
-    self.wrong_place_right_letter = ""
-    self.wrong_place_wrong_letter = ""
+    self.translator: WordleTranslator = WordleTranslator()
     
     self.action_mapping = {
       State.WAITING: {
@@ -136,20 +112,7 @@ class WordleGameState(GameState):
     if player_id not in self.guess_history:
       self.add_player(player_id)
     return self.guess_history[player_id]
-  
-  def _get_random_symbol(self) -> str:
-    n = randint(0, len(_possible_symbols))
-    n2 = randint(1, 3) + n % len(_possible_symbols)
-    return _possible_symbols[n:n2]
-  
-  def _get_random_color(self) -> str:
-      return random.choice(_possible_colors)
-  
-  
-  def _modify_game(self):
-    self.right_place_right_letter: str = self._get_random_color()
-    self.wrong_place_right_letter: str = self._get_random_color()
-    self.wrong_place_wrong_letter: str = self._get_random_color()
+
   
   def add_to_guess(self, player_id: str, addition: str):
     current_guess = self.get_current_guess(player_id)
@@ -178,47 +141,21 @@ class WordleGameState(GameState):
     if len(current_guess) == 0:
       return
     
-    is_correct = True
-    output = ""
-    player_input = current_guess.upper() + ("_" * max((len(answer) - len(current_guess), 0)))
     self.set_current_guess(player_id, "")
     
-    self._modify_game()
     if player_id not in self.scores:
       self.scores[player_id] = Score()
     
     self.scores[player_id].add_score(5)
-      
     
-    m_len = min(len(answer), len(player_input))
-    output = ["" for _ in range(m_len) ]
-    letter_count = self.letter_counts[self.word_index[player_id]].copy()
-    logger.info(letter_count)    
-    for i in range(m_len):
-      color = ""
-      
-      if player_input[i] == answer[i]:
-        color = self.right_place_right_letter
-      else:
-        is_correct = False
-        
-        if player_input[i] in answer and letter_count[player_input[i]] > 0:
-          color = self.wrong_place_right_letter
-        else:
-          color = self.wrong_place_wrong_letter
-      
-      if answer[i] in letter_count:
-        letter_count[answer[i]] -= 1
-      
-      output[i] = color
-
+    (guess, colors, is_correct) = self.translator.translate(answer, current_guess)    
     if is_correct:
       self.scores[player_id].add_score(2500)
       self.scores[player_id].add_multiplier(1)
       self.increment_word_index(player_id)
       self.reset_guess_history(player_id)
     else:
-      self.add_to_guess_history(player_id, player_input, output)
+      self.add_to_guess_history(player_id=player_id, guess=guess, colors=colors)
       self.scores[player_id].add_multiplier(-0.1)
     
  
@@ -237,7 +174,6 @@ class WordleGameState(GameState):
     if self.state == State.INITIALIZING:
       try:
         self.words = self.word_db.get_random_word_list(100)
-        self.letter_counts = [_build_letter_count(word.upper()) for word in self.words]
       except Exception as e:
         logger.error(e)
         self.state = State.OVER
