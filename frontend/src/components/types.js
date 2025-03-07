@@ -7,12 +7,10 @@ class Entry {
   constructor(guess, colors) {
     this.guess = guess;
     this.colors = colors;
+    this.id = ""
   }
 }
 
-class WordleState {
-
-}
 
 
 export { Entry }

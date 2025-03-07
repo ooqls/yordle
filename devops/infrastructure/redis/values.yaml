@@ -1,0 +1,40 @@
+image:
+  registry: docker.io
+  repository: bitnami/redis
+  tag: 7.4.2
+  pullPolicy: IfNotPresent
+
+master:
+  persistence:
+    enabled: true
+    storageClass: "nfs"
+    accessModes:
+      - ReadWriteOnce
+    size: 8Gi
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 200m
+
+replica:
+  replicaCount: 1
+  persistence:
+    enabled: true
+    storageClass: "nfs"
+    accessModes:
+      - ReadWriteOnce
+    size: 8Gi
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 200m
+
+metrics:
+  enabled: false
+

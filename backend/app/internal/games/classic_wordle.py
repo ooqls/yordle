@@ -4,12 +4,11 @@ from internal.games.player_input import PlayerInput
 from internal.models import GameKey, PlayerID
 from internal.games.models  import Action, Guess, GuessHistory
 from internal.games.wordle_translator import WordleTranslator
-from enum import Enum
 import logging
 
 logger = logging.getLogger(__name__)
 GAME_KEY: str = "classicyordle"
-DISPLAY_NAME: str = "✨ Yordle"
+DISPLAY_NAME: str = "🪨 Yordle"
 
 def new_classic_wordle_game(id: PlayerID, key: str) -> GameState:
   return ClassicWordleGameState(admin_id=id, key=key)

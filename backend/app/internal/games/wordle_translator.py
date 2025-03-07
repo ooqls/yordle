@@ -1,6 +1,5 @@
 from functools import lru_cache
 import random
-_possible_symbols: str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+{}|:<>?[];',./"
 _possible_colors: list[str] = [
   "Red", "Green", "Yellow", "Cyan", "Magenta", "Orange", "Purple", "Brown", "Pink"
 ]

@@ -1,12 +1,14 @@
 <div class={disableMobileView ? "always-view" : "desktop-view"}>
   <List>
     {#each Object.entries(scores) as [key, value]}
-    <Item class={key === currentPlayerId ? 'activated' : ''}>
-      <Text>
-        <Score score={value} player={key === currentPlayerId ? "you" : key} />
-      </Text>
-    </Item>
-    <Separator />
+    <div transition:slide={{duration: 300}}>
+      <Item class={key === currentPlayerId ? 'activated' : ''}>
+        <Text>
+          <Score score={value} player={key === currentPlayerId ? "you" : key} />
+        </Text>
+      </Item>
+      <Separator />
+    </div>
     {/each}
   </List>
 </div>
@@ -47,7 +49,7 @@
 
 <script>
   import { run } from 'svelte/legacy';
-
+  import { fade, slide } from "svelte/transition";
   import List, { Item, Separator, Text } from '@smui/list'; 
   import Score from "./score.svelte";
   import Rank from './rank.svelte';

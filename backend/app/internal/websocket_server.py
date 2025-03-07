@@ -29,7 +29,6 @@ class WeboscketGameServer:
   async def start_broadcasting(self):
     while True:
       for game in self.controller.get_active_games():
-        logger.info("broadcasting: %s", game.key)
         try:
           await self.controller.broadcast_game_state(game_key=game.key)
           await self.controller.update_state(game.key)
@@ -55,7 +54,6 @@ class WeboscketGameServer:
       await self.disconnect_player(websocket, game_key, client_id)
     
   async def _connect(self, websocket: Socket, game_key: str, game_type: str, client_id: str):
-    logger.info("client key: %s", client_id)
     
     if self.controller.get_game(game_key=game_key) is None:
       self.controller.new_game(player_id=client_id, game_type=game_type, key=game_key)
@@ -68,7 +66,6 @@ class WeboscketGameServer:
   
       
       player_input = to_player_input(event)
-      print(player_input.action)
       game = self.controller.get_game(game_key=game_key)
       if not game is None:
         game.play_game(id=client_id, player_input=player_input)

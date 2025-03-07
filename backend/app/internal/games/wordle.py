@@ -1,9 +1,5 @@
 from random import randint
-import random
-import string
-import asyncio
 import logging
-import os
 import sys
 
 
@@ -196,14 +192,13 @@ class WordleGameState(GameState):
     return self.start_time
 
   def get_state(self, player_id: PlayerID) -> dict:
-    if len(self.words) > 0:
-      print("%s: %s" % (player_id, self.get_answer(player_id)))
     state = {
       "state": str(self.state),
       "current_guess": self.current_guess[self.word_index[player_id]],
       "guess_history": GuessHistory(guesses=self.get_guess_history(player_id)).model_dump(),
       "scores": {id: score.get_score() for id, score in self.scores.items()},
-      "word_index": self.word_index
+      "word_index": self.word_index,
+      "is_admin": player_id == self.admin,
     }
         
     if self.state in [State.ACTIVE, State.STARTING]:

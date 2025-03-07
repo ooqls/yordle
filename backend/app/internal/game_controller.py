@@ -119,7 +119,6 @@ class GameController:
     
   async def update_state(self, game_key):
     if game_key in self.active_games:
-      logger.info("updating game state %s", game_key)
       game = self.active_games[game_key]
       game.update()
       
@@ -132,7 +131,6 @@ class GameController:
       
       
   async def broadcast_game_state(self, game_key: str):
-    logger.info("gamekey: %s", game_key)
     if game_key in self.active_games and game_key in self.connections:
       game = self.active_games[game_key]
       player_conns = self.get_players_in_game(game_key).copy()
@@ -141,9 +139,7 @@ class GameController:
         self.remove_game(game_key)
         return
       
-      logger.debug("cons %s", player_conns)
       for player_id, conn in player_conns.items():
-        logger.info("sending to player %s", player_id)
         ev = {"event": "game_update", "game_Key": game_key, "state": game.get_state(player_id)}
         
         try:

@@ -3,6 +3,7 @@
   <div class="game-container">
     <Title title="yordle"></Title>
     <div class="button-container">
+      <h2>{data.gameKey}</h2>
       <Button onclick={() => { leaveGame() }}>Leave</Button>
       {#if curState == GameState.ACTIVE}
       <h2>Guesses Left: {displayGuesses}</h2>
@@ -256,6 +257,7 @@ function connect() {
 */
 onMount(() => {
   clientId = data.clientId
+  console.log(clientId)
   currentGuess = ""
   answerLen = 10
 
@@ -312,12 +314,6 @@ function newActionMessage(action, messageData) {
 function submitAnswer() {
   if (socket && isActive()) {
     socket.send(newActionMessage("SUBMIT", null))
-  }
-}
-
-function startGame() {
-  if (socket && curState === GameState.WAITING) {
-    socket.send(newActionMessage("START", null))
   }
 }
 

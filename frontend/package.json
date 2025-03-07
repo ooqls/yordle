@@ -36,6 +36,7 @@
 	"dependencies": {
 		"cockatiel": "^3.2.1",
 		"dotenv": "^16.4.5",
+		"iconify-icon": "^2.3.0",
 		"socket.io": "^4.7.5",
 		"socket.io-client": "^4.7.5",
 		"svelte-websocket-store": "^1.1.34"
