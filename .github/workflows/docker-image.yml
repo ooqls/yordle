@@ -18,6 +18,8 @@ jobs:
       run: make build_backend
     - name: Build the frontend
       run: make build_frontend
+    - name: login to docker hub
+      run: echo "${{ secrets.DOCKER_REGISTRY_TOKEN }}" | docker login -u samrreynolds4 --password-stdin
     - name: push the backend
       run: make push_backend
     - name: push the frontend
